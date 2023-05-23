@@ -2,6 +2,7 @@ package com.manoj.springboot.restful.springbootrestfulwebservice.service.impl;
 
 import com.manoj.springboot.restful.springbootrestfulwebservice.dto.UserDto;
 import com.manoj.springboot.restful.springbootrestfulwebservice.entity.User;
+import com.manoj.springboot.restful.springbootrestfulwebservice.exception.EmailAlreadyExistException;
 import com.manoj.springboot.restful.springbootrestfulwebservice.exception.ResourceNotFoundException;
 import com.manoj.springboot.restful.springbootrestfulwebservice.mapper.AutoUserMapper;
 import com.manoj.springboot.restful.springbootrestfulwebservice.repository.UserRepository;
@@ -11,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +27,10 @@ public class UserServiceImpl implements UserService {
         // Convert UserDto into user object
         //User user = UserMapper.mapFromUserDto(userDto);
 //        User user = modelMapper.map(userDto, User.class);
+        Optional<User> existingUser = userRepository.findByEmail(userDto.getEmail());
+        if (existingUser.isPresent()) {
+            throw new EmailAlreadyExistException(existingUser.get().getEmail());
+        }
         User user = AutoUserMapper.getInstance.mapToUser(userDto);
 
 //        User savedUser = userRepository.save(user);

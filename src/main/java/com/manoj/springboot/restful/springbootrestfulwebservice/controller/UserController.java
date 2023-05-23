@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @AllArgsConstructor
@@ -25,12 +24,7 @@ public class UserController {
 
     @GetMapping("{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable("id") Long id) {
-        UserDto user = null;
-        try {
-            user = userService.getUserById(id);
-        } catch (NoSuchElementException e) {
-            System.out.println("user not found: " + id + ", error: " + e.getMessage());
-        }
+        UserDto user = userService.getUserById(id);
         return new ResponseEntity<UserDto>(user, HttpStatus.OK);
     }
 
@@ -53,4 +47,15 @@ public class UserController {
         return new ResponseEntity<String>("user deleted", HttpStatus.OK);
 
     }
+
+//    @ExceptionHandler(ResourceNotFoundException.class)
+//    public ResponseEntity<ErrorDetails> handleResourceNotFoundException(ResourceNotFoundException resourceNotFoundException, WebRequest webRequest) {
+//        ErrorDetails errorDetails = new ErrorDetails(
+//                LocalDateTime.now(),
+//                resourceNotFoundException.getMessage(),
+//                webRequest.getDescription(true),
+//                "USER_NOT_FOUND"
+//        );
+//        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+//    }
 }

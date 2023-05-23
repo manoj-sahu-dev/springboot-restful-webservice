@@ -2,6 +2,7 @@ package com.manoj.springboot.restful.springbootrestfulwebservice.service.impl;
 
 import com.manoj.springboot.restful.springbootrestfulwebservice.dto.UserDto;
 import com.manoj.springboot.restful.springbootrestfulwebservice.entity.User;
+import com.manoj.springboot.restful.springbootrestfulwebservice.exception.ResourceNotFoundException;
 import com.manoj.springboot.restful.springbootrestfulwebservice.mapper.AutoUserMapper;
 import com.manoj.springboot.restful.springbootrestfulwebservice.repository.UserRepository;
 import com.manoj.springboot.restful.springbootrestfulwebservice.service.UserService;
@@ -38,8 +39,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(Long id) {
-        var optionalUser = userRepository.findById(id);
-        User user = optionalUser.get();
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("user", "userId", id)
+        );
+//        User user = optionalUser.get();
 //        return modelMapper.map(user, UserDto.class);
         return AutoUserMapper.getInstance.mapToUserDto(user);
     }
@@ -53,7 +56,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(UserDto user) {
-        User existingUser = userRepository.findById(user.getId()).get();
+        User existingUser = userRepository.findById(user.getId()).orElseThrow(
+                () -> new ResourceNotFoundException("User", "userId", user.getId())
+        );
         existingUser.setFirstName(user.getFirstName());
         existingUser.setLastName(user.getLastName());
         existingUser.setEmail(user.getEmail());
@@ -64,7 +69,9 @@ public class UserServiceImpl implements UserService {
     }
 
     public void deleteUser(Long id) {
-        User existingUser = userRepository.findById(id).get();
+        User existingUser = userRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("User", "userId", id)
+        );
         userRepository.delete(existingUser);
     }
 }
